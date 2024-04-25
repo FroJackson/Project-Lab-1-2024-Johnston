@@ -4,7 +4,7 @@ module PWM_Generator(
     output PWM
 );
 
-    reg [19:0] width = 20'd500000;         // Pulse Width
+    reg [19:0] width = 20'd750000;         // Pulse Width
     reg [4:0] out_PWM;       // For Output Minipulation
     reg [19:0] count;
 
