@@ -1,9 +1,10 @@
 module Ball_Controller(
-    input clk, k1, k10, T_C, PR, enA_OC, enB_OC,
+    input clk, k1, k10, T_C, PR_Signal,
  //   output reg LED1, //output reg GRAB_FIRE,
     output reg [4:1]IN,
     output reg [0:1]Encoder_Turn,
-    output reg Turn_Start
+    output reg Turn_Start,
+    output reg PR
 );
    
 reg S_C = 0;
@@ -15,8 +16,20 @@ reg Turn_Start_Hold = 0;
 parameter Short_Right = 2'b01;
 parameter Short_Left = 2'b10;
 
+reg [0:29] PR_delay = 0;
+reg PR_enable = 0;
+
 
 always @(posedge clk) begin
+    if (~PR_enable)begin 
+        PR_delay = PR_delay + 1;
+        if(PR_delay >= 50_000_000) begin
+            PR_enable = 1;
+        end 
+    end
+
+ PR = PR_enable & PR_Signal;
+
     if(PR & ~PR_Latch)begin
         LEDON = 1;//GRAB_FIRE = 0;
         PR_Latch = 1;
