@@ -1,0 +1,52 @@
+module IR (
+    input IR_signal,
+    input clk,
+    output k1,
+    output k10
+);
+
+    reg [10:0] count = 0;
+    reg wave_state = 0;
+    reg previous_wave_state = 0;
+    reg k1_signal = 0;
+    reg k10_signal = 0;
+    reg sample = 0;
+    reg [23:0]sample_count = 0;
+    reg Latch = 1;
+    
+
+always @(posedge clk) begin
+        if(Latch)begin
+            wave_state <= IR_signal;
+            if (wave_state & ~previous_wave_state) begin
+                count <= count + 1;
+                sample = 1;
+            end
+            
+            if(sample)begin
+                sample_count = sample_count + 1;
+            end
+            
+            if(sample_count >= 10_000_000)begin 
+                if (( 70 <= count) && (count <= 130)) begin //700-1300 Hz
+                    k1_signal <= 1;
+                    Latch <= 0;
+                end
+                if ((950 <= count) && (count <= 1_050)) begin //9.5-10.5 kHz
+                    k10_signal <= 1;
+                    Latch <= 0;
+                end
+                else begin
+                    k1_signal = 0;
+                    k10_signal = 0;
+                    count = 0;
+                    sample = 0;
+                    sample_count = 0;
+                end
+            end
+            previous_wave_state <= wave_state;
+   end
+end
+    assign k1 = k1_signal;
+    assign k10 = k10_signal;
+endmodule
