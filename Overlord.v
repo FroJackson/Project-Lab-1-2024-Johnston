@@ -6,13 +6,26 @@ module New_Overlord (
     input PWM_R, PWM_L,
     input enA_OC, enB_OC,
     input enA_RE, enB_RE,
+    
+    input en_A_Find,
+    input en_B_Find,
+    
     input Turn_Start,
     input T_C,
     input [4:1] BC_IN,
     input [4:1] ET_IN, 
+    
+    input FIND_IN_1,
+    input FIND_IN_2,
+    input FIND_IN_3,
+    input FIND_IN_4,
+    
     input RvL,
     input k1,
     input k10,
+    
+    input R_final_signal,
+    input L_final_signal,
 
     output f_IN1, f_IN2, f_IN3, f_IN4,
     output f_enA, f_enB,
@@ -28,15 +41,20 @@ module New_Overlord (
     output Border_R,
     output Turn_Start_LED,
     output T_C_LED,
-    output Fire_LED
-);
-    assign f_enA = (enable & Attack_start) & ((~PR & enA_OC & PWM_R) | (PR & PWM & enA_OC & enA_RE));
-    assign f_enB = (enable & Attack_start) & ((~PR & enB_OC & PWM_L) | (PR & PWM & enB_OC & enB_RE));
+    //output Fire_LED
     
-    assign f_IN1 = (enable & Attack_start) & ((~PR & 0 & PWM_R) | (PR & ((BC_IN[1] & ~Turn_Start) | (ET_IN[1] & Turn_Start)) & PWM));
-    assign f_IN2 = (enable & Attack_start) & ((~PR & 1 & PWM_L) | (PR & ((BC_IN[2] & ~Turn_Start) | (ET_IN[2] & Turn_Start)) & PWM));
-    assign f_IN3 = (enable & Attack_start) & ((~PR & 1 & PWM_R) | (PR & ((BC_IN[3] & ~Turn_Start) | (ET_IN[3] & Turn_Start)) & PWM));
-    assign f_IN4 = (enable & Attack_start) & ((~PR & 0 & PWM_L) | (PR & ((BC_IN[4] & ~Turn_Start) | (ET_IN[4] & Turn_Start)) & PWM));
+    output Border_L2,
+    output R_Final_LED,
+    output L_Final_LED,
+    output Border_R2
+);
+    assign f_enA = (enable & Attack_start) & ((~PR & enA_OC & PWM_R & en_A_Find) | (PR & PWM & enA_OC /*& enA_RE*/));
+    assign f_enB = (enable & Attack_start) & ((~PR & enB_OC & PWM_L & en_B_Find) | (PR & PWM & enB_OC /*& enB_RE)*/));
+    
+    assign f_IN1 = (enable & Attack_start) & ((~PR & FIND_IN_1) | (PR & ((BC_IN[1] & ~Turn_Start) | (ET_IN[1] & Turn_Start))));
+    assign f_IN2 = (enable & Attack_start) & ((~PR & FIND_IN_2) | (PR & ((BC_IN[2] & ~Turn_Start) | (ET_IN[2] & Turn_Start))));
+    assign f_IN3 = (enable & Attack_start) & ((~PR & FIND_IN_3) | (PR & ((BC_IN[3] & ~Turn_Start) | (ET_IN[3] & Turn_Start))));
+    assign f_IN4 = (enable & Attack_start) & ((~PR & FIND_IN_4) | (PR & ((BC_IN[4] & ~Turn_Start) | (ET_IN[4] & Turn_Start))));
     
     assign fire = T_C;
     
@@ -50,6 +68,10 @@ module New_Overlord (
     assign Border_R = 1;
     assign Turn_Start_LED = Turn_Start;
     assign T_C_LED = T_C;
+    assign R_Final_LED = R_final_signal;
+    assign L_Final_LED = L_final_signal;
+    assign Border_L2 = 1;
+    assign Border_R2 = 1;
     //assign Fire_LED = T_C;
 
 endmodule
